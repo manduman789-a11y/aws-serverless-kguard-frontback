@@ -11,6 +11,53 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
-</body>
 
+  <div id="chat-widget" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+      <button onclick="toggleChat()" style="width: 60px; height: 60px; border-radius: 50%; background: #000; border: 2px solid #00ff00; color: #00ff00; font-weight: bold; cursor: pointer;">CHAT</button>
+      
+      <div id="chat-box" style="display: none; position: absolute; bottom: 70px; right: 0; width: 300px; height: 400px; background: rgba(0,0,0,0.9); border: 2px solid #00ff00; border-radius: 10px; flex-direction: column;">
+          <div id="chat-logs" style="flex: 1; padding: 10px; overflow-y: auto; color: #fff;">
+              <div style="color: #00ff00;">[시스템] 기록관 연결됨.</div>
+          </div>
+          <div style="display: flex; border-top: 1px solid #00ff00;">
+              <input id="chat-input" type="text" placeholder="입력..." style="flex: 1; background: #222; color: #fff; border: none; padding: 10px;">
+              <button onclick="sendMessage()" style="background: #004400; color: #fff; border: none; padding: 5px 10px;">전송</button>
+          </div>
+      </div>
+  </div>
+
+  <script>
+      // ★★★ 중요: 아래 주소를 3단계에서 만든 '내 람다 주소'로 꼭 바꿔야 합니다! ★★★
+      const API_URL = "https://여기에_람다_함수_URL을_붙여넣으세요"; 
+
+      function toggleChat() {
+          const box = document.getElementById('chat-box');
+          box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+      }
+
+      async function sendMessage() {
+          const input = document.getElementById('chat-input');
+          const logs = document.getElementById('chat-logs');
+          const msg = input.value;
+          if (!msg) return;
+
+          logs.innerHTML += `<div>나: ${msg}</div>`;
+          input.value = '';
+
+          try {
+              const res = await fetch(API_URL, {
+                  method: 'POST',
+                  // CORS 오류 방지를 위해 no-cors는 쓰지 마시고, 람다 설정을 믿으세요.
+                  body: JSON.stringify({ message: msg, user_id: "dudgns901" })
+              });
+              const data = await res.json();
+              logs.innerHTML += `<div style="color: #00ff00;">기록관: ${data.reply}</div>`;
+          } catch (e) {
+              console.error(e);
+              logs.innerHTML += `<div style="color: red;">오류 발생</div>`;
+          }
+          logs.scrollTop = logs.scrollHeight;
+      }
+  </script>
+  </body>
 </html>
